@@ -15,4 +15,4 @@ Thumbs.db
 dist/
 
 # Other commonly ignored files
-# .env
+.env
