@@ -27,7 +27,7 @@ class Helpers {
       ? this.ngroakUrl
       : this.server;
 
-  static baseUrl: string = `${this.localhost}`;
+  static baseUrl: string = `${this.server}`;
   static apiUrl: string = `${this.baseUrl}/api/v1/`;
 
   static localStorageTokenKey = "token";
