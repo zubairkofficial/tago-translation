@@ -321,7 +321,7 @@ async function startServer() {
     }
 
     // Sync database models
-    await sequelize.sync({ alter: false });
+    await sequelize.sync({ alter: true });
     console.log("Database synchronized");
 
     initUserModel(sequelize); //------------
