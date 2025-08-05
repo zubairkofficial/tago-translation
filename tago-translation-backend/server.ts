@@ -119,7 +119,7 @@ app.get("/health", (req, res) => {
 });
 
 // Serve static files from uploads folder
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use("/api/v1/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Socket.IO server for WebRTC signaling
 const httpServer = createServer(app);
