@@ -2,6 +2,9 @@ import { Request, response, Response } from "express";
 import { RoomServiceClient, AccessToken } from "livekit-server-sdk";
 import { Room, RoomToken, User } from "../config/database";
 import { customErrorReponse, isCustomError } from "../config/helpers";
+import fetchModule from 'node-fetch';
+(globalThis as any).fetch = (fetchModule as any).default || fetchModule;
+
 
 const livekitHost = "wss://test-tago-bits-hi4jwi9r.livekit.cloud";
 const roomService = new RoomServiceClient(
@@ -9,6 +12,7 @@ const roomService = new RoomServiceClient(
   process.env.LIVEKIT_API_KEY || "",
   process.env.LIVEKIT_API_SECRET || ""
 );
+
 
 const getTokenLiveKit = async (
   participantName: string,
@@ -46,9 +50,16 @@ const getTokenLiveKit = async (
 
 export const createRoom = async (req: Request, res: Response): Promise<any> => {
   try {
-  const { roomName, goRoom } = req.body;
+    console.log('--- Create Room Request Start ---');
+    console.log('Request body:', req.body);
+    console.log('Request user:', req.user);
+    console.log('LIVEKIT_API_KEY:', process.env.LIVEKIT_API_KEY ? '[SET]' : '[NOT SET]');
+    console.log('LIVEKIT_API_SECRET:', process.env.LIVEKIT_API_SECRET ? '[SET]' : '[NOT SET]');
+    console.log('LiveKit Host:', livekitHost);
+    const { roomName, goRoom } = req.body;
 
     if (!roomName) {
+      console.error('Room creation failed: Room Name is missing');
       res
         .status(403)
         .json({ success: "false", message: "The Room Name field is required" });
@@ -59,7 +70,6 @@ export const createRoom = async (req: Request, res: Response): Promise<any> => {
 
     // Check if user exists before proceeding
     const userExists = await User.findByPk(userId);
-    console.log("coming and check user exist")
     if (!userExists) {
       console.error('User not found in DB:', userId); // Debug log
       return res.status(400).json({ success: false, message: "User does not exist. Cannot create room.", userId });
@@ -71,9 +81,16 @@ export const createRoom = async (req: Request, res: Response): Promise<any> => {
       maxParticipants: 20,
       metadata: userId,
     };
-console.log("coming",opts)
-    const room = await roomService.createRoom(opts);
-console.log("coming this side=====================")
+    console.log('Room creation options:', opts);
+    let room;
+    try {
+      room = await roomService.createRoom(opts);
+      console.log('Room created on LiveKit:', room);
+    } catch (err) {
+      console.error('Error creating room on LiveKit:', err);
+      throw err;
+    }
+
     const roomData = await {
       sid: room.sid,
       name: room.name,
@@ -91,31 +108,38 @@ console.log("coming this side=====================")
       creationTimeMs: String(room.creationTimeMs) || "",
       user_id: userId,
     };
-console.log("not coming+++++++")
-    // console.log('room',roomData)
-    await Room.validateRoom(roomData);
-    console.log("validation passed");
-    let roomId;
-   try{
-     const alreadyExistSid = await Room.findOne({
-       where: { sid: roomData.sid },
-     });
-     if (!alreadyExistSid) {
-       const roomNewRow = await Room.create(roomData);
-       roomId = roomNewRow.id;
-     } else {
-       roomId = alreadyExistSid.id;
-     }
 
-   }catch(error:any){
-    console.log("error", error);
-   }
+    console.log('Room data to validate/store:', roomData);
+    try {
+      await Room.validateRoom(roomData);
+      console.log("Room validation passed");
+    } catch (err) {
+      console.error('Room validation failed:', err);
+      throw err;
+    }
+    let roomId;
+    try {
+      const alreadyExistSid = await Room.findOne({
+        where: { sid: roomData.sid },
+      });
+      if (!alreadyExistSid) {
+        const roomNewRow = await Room.create(roomData);
+        roomId = roomNewRow.id;
+        console.log('Room row created in DB:', roomNewRow);
+      } else {
+        roomId = alreadyExistSid.id;
+        console.log('Room already exists in DB, using existing row:', alreadyExistSid);
+      }
+    } catch (error: any) {
+      console.error('Error saving room to DB:', error);
+    }
     if (goRoom) {
       try {
-
-        const tokenData = await getTokenLiveKit(req.user.name, roomData.name); // Pass the same req and res to createToken
-        // console.log("shahab", tokenData);
+        console.log('goRoom is true, generating LiveKit token...');
+        const tokenData = await getTokenLiveKit(req.user.name, roomData.name);
+        console.log('Token data:', tokenData);
         if (!tokenData.success) {
+          console.error('Token generation failed:', tokenData);
           return res.status(400).json({
             success: false,
             tokenMessage: tokenData.message,
@@ -123,21 +147,23 @@ console.log("not coming+++++++")
             roomCreate: true,
             roomMessage: "Room Create succefully",
           });
-        } // Ensure the response is sent immediately after creating the token
+        }
         await RoomToken.create({
           token: tokenData.token,
           room_id: roomId || "",
           user_id: userId,
         });
+        console.log('RoomToken created in DB');
         return res.status(200).json({ success: true, token: tokenData.token });
       } catch (error: any) {
-        console.log("error", error);
+        console.error('Error in goRoom/token logic:', error);
         if (isCustomError(error)) {
           return customErrorReponse(error, res);
         }
         res.status(500).json({ success: false, message: error.message });
       }
     }
+    console.log('Room creation complete, sending response.');
     res.status(201).json({ success: true, room });
   } catch (error: any) {
     if (isCustomError(error)) {
