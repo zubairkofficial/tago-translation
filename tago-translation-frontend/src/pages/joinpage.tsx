@@ -611,7 +611,7 @@ const JoinPage = () => {
       sourceNodeRef.current = audioContextRef.current.createMediaStreamSource(stream);
 
       // --- AudioWorkletNode replacement for ScriptProcessorNode ---
-      await audioContextRef.current.audioWorklet.addModule('/src/audio-processor.js');
+      await audioContextRef.current.audioWorklet.addModule('/audio-processor.js');
       workletNodeRef.current = new AudioWorkletNode(audioContextRef.current, 'audio-processor');
       audioChunksRef.current = [];
       chunkIndexRef.current = 0;
