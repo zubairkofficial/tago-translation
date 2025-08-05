@@ -72,7 +72,7 @@ export const createRoom = async (req: Request, res: Response): Promise<any> => {
     };
 
     const room = await roomService.createRoom(opts);
-
+console.log("coming this side=====================")
     const roomData = await {
       sid: room.sid,
       name: room.name,
@@ -90,7 +90,7 @@ export const createRoom = async (req: Request, res: Response): Promise<any> => {
       creationTimeMs: String(room.creationTimeMs) || "",
       user_id: userId,
     };
-
+console.log("not coming+++++++")
     // console.log('room',roomData)
     await Room.validateRoom(roomData);
     console.log("validation passed");
