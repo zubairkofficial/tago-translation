@@ -38,9 +38,9 @@ const Dashboard = () => {
   const userName = user?.fullName || user?.name || "User";
 
   const profileImage = user?.imageUrl
-    ? user?.imageUrl.startsWith("http")
+    ? user?.imageUrl.startsWith("https")
       ? user.imageUrl
-      : Helpers.baseUrl + user.imageUrl
+      : `${Helpers.baseUrl}/api/v1` + user.imageUrl
     : image;
 
   const generateMeetingId = () => {
