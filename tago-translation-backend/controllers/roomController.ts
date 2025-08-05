@@ -71,7 +71,7 @@ export const createRoom = async (req: Request, res: Response): Promise<any> => {
       maxParticipants: 20,
       metadata: userId,
     };
-
+console.log("coming",opts)
     const room = await roomService.createRoom(opts);
 console.log("coming this side=====================")
     const roomData = await {
