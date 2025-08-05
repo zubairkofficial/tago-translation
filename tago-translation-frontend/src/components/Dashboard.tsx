@@ -40,7 +40,7 @@ const Dashboard = () => {
   const profileImage = user?.imageUrl
     ? user?.imageUrl.startsWith("http")
       ? user.imageUrl
-      : Helpers.baseUrl + user.imageUrl
+      : `${Helpers.baseUrl}/api/v1` + user.imageUrl
     : image;
 
   const generateMeetingId = () => {

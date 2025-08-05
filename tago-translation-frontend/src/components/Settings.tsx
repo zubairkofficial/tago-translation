@@ -78,13 +78,13 @@ const Settings = () => {
       });
       const data = await res.json();
       if (data.success && data.imageUrl) {
-        setProfileImage(Helpers.baseUrl + data.imageUrl);
+        setProfileImage(`${Helpers.baseUrl}/api/v1` + data.imageUrl);
         // Update local userData
         const user = Helpers.getUserData();
         if (user) {
           user.imageUrl = data.imageUrl;
           Helpers.saveUserLocal({ token: token || "", user });
-          setProfileImage(Helpers.baseUrl + data.imageUrl);
+          setProfileImage(`${Helpers.baseUrl}/api/v1`+ data.imageUrl);
         }
       }
     } catch (err) {
@@ -157,7 +157,7 @@ const Settings = () => {
 
   useEffect(() => {
     const user = Helpers.getUserData();
-    setProfileImage(user?.imageUrl ? Helpers.baseUrl + user.imageUrl : image);
+    setProfileImage(user?.imageUrl ? `${Helpers.baseUrl}/api/v1` + user.imageUrl : image);
   }, []);
 
   return (
