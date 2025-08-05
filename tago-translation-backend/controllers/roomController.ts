@@ -59,6 +59,7 @@ export const createRoom = async (req: Request, res: Response): Promise<any> => {
 
     // Check if user exists before proceeding
     const userExists = await User.findByPk(userId);
+    console.log("coming and check user exist")
     if (!userExists) {
       console.error('User not found in DB:', userId); // Debug log
       return res.status(400).json({ success: false, message: "User does not exist. Cannot create room.", userId });
