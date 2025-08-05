@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useLiveKit } from '@/hooks/useLiveKit';
 import { LocalAudioTrack, RemoteParticipant, RoomEvent } from 'livekit-client';
 
-const API_BASE_URL = "http://localhost:3000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 interface TranscriptionMessage {
   type: "transcription";
