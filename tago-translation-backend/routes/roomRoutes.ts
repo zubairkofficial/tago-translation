@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createRoom, getRooms, deleteRoom, createToken, roomCreater, getRoomDetails } from '../controllers/roomController';
+import { createRoom, getRooms, deleteRoom, createToken, roomCreater, getRoomDetails, getPersonalRooms } from '../controllers/roomController';
 import authMiddleware from '../middlewares/authMiddleware';
 
 const router = Router();
@@ -16,6 +16,9 @@ router.post('/', createRoom);
 
 // Get all rooms
 router.get('/', getRooms);
+
+
+router.get('/personal-room', getPersonalRooms);
 
 // Delete a room
 router.delete('/', deleteRoom);

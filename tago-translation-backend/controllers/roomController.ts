@@ -185,6 +185,18 @@ export const getRooms = async (req: Request, res: Response): Promise<any> => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+export const getPersonalRooms = async (req: Request, res: Response): Promise<any> => {
+  try {
+    // console.log('Fetching rooms for user:', req.user.id); // Debug log
+    const rooms = await Room.findAll({
+      where: { user_id: req.user.id },
+      order: [['createdAt', 'DESC']],
+    });
+    res.status(200).json({ success: true, rooms });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 export const deleteRoom = async (req: Request, res: Response): Promise<any> => {
   try {
