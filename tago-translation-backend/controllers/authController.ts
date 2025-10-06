@@ -40,20 +40,21 @@ export const registerUser = async (
       email,
       password,
       status: "offline",
-      otp,
+      // otp,
       phoneNo,
+      verifiedAt : new Date(),
       language: language || "en-US",
     });
 
     const sendUserReponse = userDataFormat(user);
     const token = await userTokenGenerate(user);
 
-    await handleEmailSend(
-      email,
-      otp,
-      "sendOtp",
-      "Verify your email address"
-    );
+    // await handleEmailSend(
+    //   email,
+    //   otp,
+    //   "sendOtp",
+    //   "Verify your email address"
+    // );
 
     res.status(201).json({
       success: true,
